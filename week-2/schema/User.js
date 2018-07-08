@@ -1,23 +1,43 @@
-const sequelize = require('../db/postgres');
-const Sequelize = require('sequelize');
+'use strict';
+
 const bcrypt = require('bcryptjs');
+const validate = require('validator');
+const Sequelize = require('sequelize');
 
-const User = sequelize.define('user', {
-id: {
-        type: Sequelize.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-    },
-    email: {
-        type: Sequelize.STRING,
-        unique: true
-    },
-    password: Sequelize.STRING
- });
+module.exports = (sequelize, DataTypes) => {
+    let User = sequelize.define('user', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            unique: true,
+            autoIncrement: true
+        },
+        email: {
+            type: Sequelize.STRING,
+            unique: true,
+            validate: {
+                isEmail: {
+                    msg: 'Email not valid'
+                },
+                
+            },
+            allowNull: false,
+        },
+        password: {
+            type: Sequelize.STRING,
+            validate: {
+                len: {
+                    args: [6,40],
+                    msg: "Password is too short or too long"
+                }
+            }
+        }
+    });
 
- User.beforeCreate((user, options) => {
-    const salt = bcrypt.genSalt(10);
-    user.password = user.password && user.password != "" ? bcrypt.hashSync(user.password, 10) : "";
- });
+    User.beforeCreate((user, options) => {
+        const salt = bcrypt.genSaltSync(10);
+        user.password = user.password && user.password != "" ? bcrypt.hashSync(user.password, salt) : "";
+     });
 
- module.exports = User;
+    return User;
+};

@@ -1,0 +1,14 @@
+//fixing travis fail build
+
+before_script: cd week-2
+
+language: node_js
+sudo: false
+node_js:
+  - "node"
+services:
+  - postgresql
+install:
+  - "npm install"
+script:
+- "npm test"
