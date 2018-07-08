@@ -4,15 +4,19 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
-const User = require('../schema/User')
+const User = require('../schema').user;
 
-//POST API
+router.get('/all', (req, res) => {
+    User.findAll()
+    .then(users => res.json(users));
+})
 
 router.post('/signup', (req, res) => {
     const newUser = {
         email: req.body.email,
         password: req.body.password
     }
+
     User.find({
         where: {
             email: newUser.email
@@ -28,14 +32,17 @@ router.post('/signup', (req, res) => {
                 let token = jwt.sign(payload, 'secretKey', { expiresIn: '1h'});
                 return res.json({ session: token })
             })
+            .catch(err => {
+                res.status(400).json({ message: err.message });
+            })
         }
         else{
             return res.status(400).json({msg: 'User already exists.'})
         }
     })
-     .catch(err => res.status(400).json(err)); });
+    .catch(err => res.status(400).json(err));
+});
 
-// LOGIN API 
 router.post('/login', (req, res) => {
     const logUser = {
         email: req.body.email,
@@ -60,10 +67,10 @@ router.post('/login', (req, res) => {
                 return res.json({ session: token });
             }
             else {
-                return res.json({msg: 'Invalid Password'})
+                return res.status(400).json({msg: 'Invalid Password'})
             }
         })
-        .catch(err => res.json(err));
+        .catch(err => res.status(401));
     })
 });
 
@@ -73,5 +80,3 @@ router.get('/current', passport.authenticate('jwt', { session: false }), (req, r
 })
 
 module.exports = router;
-
-
