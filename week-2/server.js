@@ -1,10 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
 const user = require('./routes/user');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 const app = express();
 
 if(process.env.NODE_ENV !== 'test') {
