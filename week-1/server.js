@@ -1,8 +1,9 @@
 // getting express and body parser :smile:
+require('dotenv').config()
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = process.env.PORT || 8200;
+const port = process.env.PORT;
 
 
 // keeping middleware before any route i.e app.get()
